@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "npx vite build",
-    "preview": "vite preview",
-    "deploy": "npm run build && node deploy.js",
-    "deploy:vercel": "npm run build && vercel --prod",
-    "deploy:netlify": "npm run build && netlify deploy --prod --dir=dist",
-    "vercel-build": "npx vite build"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0",
