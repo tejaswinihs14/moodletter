@@ -96,8 +96,19 @@ export default function NewsletterBuilder() {
       showMessage("error", "Please enter a subject line");
       return false;
     }
+    if (subject.length > 100) {
+      showMessage("error", "Subject line must be 100 characters or less");
+      return false;
+    }
     if (!body.trim()) {
       showMessage("error", "Please enter newsletter content");
+      return false;
+    }
+    if (body.length > 1000) {
+      showMessage(
+        "error",
+        "Newsletter content must be 1000 characters or less"
+      );
       return false;
     }
     if (selectedRecipients.length === 0) {
@@ -233,24 +244,26 @@ export default function NewsletterBuilder() {
     const IconComponent = currentMood.icon;
     return (
       <div
-        className={`p-6 rounded-xl border-2 ${currentMood.borderColor} ${currentMood.color}`}
+        className={`p-4 sm:p-6 rounded-xl border-2 ${currentMood.borderColor} ${currentMood.color} overflow-hidden`}
       >
         <div className="text-center mb-4">
-          <IconComponent className="w-12 h-12 mx-auto" />
-          <h3 className={`text-xl font-bold ${currentMood.textColor} mt-2`}>
+          <IconComponent className="w-10 h-10 sm:w-12 sm:h-12 mx-auto" />
+          <h3
+            className={`text-lg sm:text-xl font-bold ${currentMood.textColor} mt-2 break-words overflow-wrap-anywhere`}
+          >
             {subject || "Newsletter Subject"}
           </h3>
         </div>
 
         <div className={`${currentMood.textColor} space-y-4`}>
-          <p className="text-sm leading-relaxed">
+          <p className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
             {body || "Your newsletter content will appear here..."}
           </p>
 
           {ctaText && (
             <div className="text-center pt-4">
               <button
-                className={`px-6 py-3 rounded-lg font-semibold text-white transition-colors ${currentMood.ctaColor}`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold text-white transition-colors text-sm sm:text-base ${currentMood.ctaColor}`}
               >
                 {ctaText}
               </button>
@@ -301,22 +314,31 @@ export default function NewsletterBuilder() {
       )}
 
       {/* Main Builder */}
-      <div className="p-6 border rounded-xl shadow-lg bg-white">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-            <EmailIcon className="w-6 h-6 mr-2" />
+      <div className="p-4 sm:p-6 border rounded-xl shadow-lg bg-white">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
+            <EmailIcon className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
             Create Newsletter
           </h2>
           <button
             onClick={() => setShowPreview(!showPreview)}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2"
+            className="px-3 sm:px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base"
           >
             <PreviewIcon className="w-4 h-4" />
-            <span>{showPreview ? "Hide Preview" : "Show Preview"}</span>
+            <span className="hidden sm:inline">
+              {showPreview ? "Hide Preview" : "Show Preview"}
+            </span>
+            <span className="sm:hidden">
+              {showPreview ? "Hide" : "Preview"}
+            </span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div
+          className={`grid gap-6 transition-all duration-300 ${
+            showPreview ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"
+          }`}
+        >
           {/* Form Section */}
           <div className="space-y-4">
             {/* Mood Selection */}
@@ -324,7 +346,7 @@ export default function NewsletterBuilder() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Choose Mood/Theme *
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">
                 {Object.entries(moods).map(([moodKey, moodData]) => {
                   const IconComponent = moodData.icon;
                   return (
@@ -405,11 +427,24 @@ export default function NewsletterBuilder() {
                 placeholder="Enter your newsletter subject..."
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  subject.length > 100
+                    ? "border-red-300 focus:ring-red-500 bg-red-50"
+                    : "border-gray-300 focus:ring-blue-500"
+                }`}
                 maxLength={100}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p
+                className={`text-xs mt-1 ${
+                  subject.length > 100
+                    ? "text-red-500 font-medium"
+                    : subject.length > 90
+                    ? "text-yellow-600"
+                    : "text-gray-500"
+                }`}
+              >
                 {subject.length}/100 characters
+                {subject.length > 100 && " (Exceeds limit!)"}
               </p>
             </div>
 
@@ -423,11 +458,24 @@ export default function NewsletterBuilder() {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 rows={6}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent resize-none ${
+                  body.length > 1000
+                    ? "border-red-300 focus:ring-red-500 bg-red-50"
+                    : "border-gray-300 focus:ring-blue-500"
+                }`}
                 maxLength={1000}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p
+                className={`text-xs mt-1 ${
+                  body.length > 1000
+                    ? "text-red-500 font-medium"
+                    : body.length > 900
+                    ? "text-yellow-600"
+                    : "text-gray-500"
+                }`}
+              >
                 {body.length}/1000 characters
+                {body.length > 1000 && " (Exceeds limit!)"}
               </p>
             </div>
 
@@ -451,9 +499,17 @@ export default function NewsletterBuilder() {
             {/* Send Button */}
             <button
               onClick={sendNewsletter}
-              disabled={isLoading || selectedRecipients.length === 0}
+              disabled={
+                isLoading ||
+                selectedRecipients.length === 0 ||
+                subject.length > 100 ||
+                body.length > 1000
+              }
               className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors flex items-center justify-center space-x-2 ${
-                isLoading || selectedRecipients.length === 0
+                isLoading ||
+                selectedRecipients.length === 0 ||
+                subject.length > 100 ||
+                body.length > 1000
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
@@ -476,15 +532,28 @@ export default function NewsletterBuilder() {
           </div>
 
           {/* Preview Section */}
-          {showPreview && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
-                <PreviewIcon className="w-5 h-5 mr-2" />
-                Live Preview
-              </h3>
+          <div
+            className={`transition-all duration-300 ${
+              showPreview ? "block opacity-100" : "hidden lg:block opacity-0"
+            }`}
+          >
+            <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+              <PreviewIcon className="w-5 h-5 mr-2" />
+              Live Preview
+            </h3>
+            {showPreview ? (
               <NewsletterPreview />
-            </div>
-          )}
+            ) : (
+              <div className="p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex items-center justify-center min-h-[300px]">
+                <div className="text-center text-gray-500">
+                  <PreviewIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">
+                    Click "Show Preview" to see your newsletter
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
